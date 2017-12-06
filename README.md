@@ -1,3 +1,4 @@
+
 ## A LSTM for 2D position estimatin  
 
 ### import packages
@@ -99,9 +100,9 @@ path='MS.mat'
 mat=spio.loadmat(path,squeeze_me=True)
 x_data=mat['MSTrain'][:,1:63].astype('float32')
 y_data=mat['MSTrain'][:,63:65].astype('float32')
-bins_before=30 #How many bins of neural data prior to the output are used for decoding
+bins_before=60 #How many bins of neural data prior to the output are used for decoding
 bins_current=1 #Whether to use concurrent time bin of neural data
-bins_after=30 #How many bins of neural data after the output are used for decoding
+bins_after=0 #How many bins of neural data after the output are used for decoding
 # Format for recurrent neural networks (SimpleRNN, GRU, LSTM)
 # Function to get the covariate matrix that includes spike history from previous bins
 X=get_spikes_with_history(x_data,bins_before,bins_after,bins_current)
@@ -136,7 +137,7 @@ plt.title('train data visualization')
 
 
 
-    <matplotlib.text.Text at 0x7f8e8a494e48>
+    <matplotlib.text.Text at 0x7ff27294df60>
 
 
 
@@ -153,9 +154,10 @@ the optimizer is `` RMSPROP`` with learning rate 0.0001 and ``MSE`` loss
 ```python
  model=Sequential() #Declare model
         #Add recurrent layer
-model.add(LSTM(100,input_shape=(X_train.shape[1],X_train.shape[2]),return_sequences=False,activation='tanh')) #Within recurrent layer, include dropout
+model.add(LSTM(200,input_shape=(X_train.shape[1],X_train.shape[2]),return_sequences=False,activation='tanh')) #Within recurrent layer, include dropout
 
 model.add(Dense(X_train.shape[2]))  
+model.add(Dense(X_train.shape[2]))
 
 model.add(Dense(y_train.shape[1]))
 
@@ -172,7 +174,7 @@ model.compile(loss='mse',
 ```python
 
 save_dir = os.path.join(os.getcwd(), 'saved_models')
-model_name = 'M1U.h5'
+model_name = 'M1UE2.h5'
 
 
 ```
@@ -183,14 +185,86 @@ useit wen you want test the network
 
 
 ```python
-path='saved_models/M1U.h5'
+path='saved_models/M1UE2.h5'
 
 model.load_weights(path)
 ```
 
 ### train the model for 100 iterations with batch_size 512
 
- model.fit(X_train,y_train,epochs=100,verbose=1,batch_size=512)
+
+```python
+ model.fit(X_train,y_train,epochs=30,verbose=1,batch_size=512)
+```
+
+    Epoch 1/30
+    23209/23209 [==============================] - 100s - loss: 0.0063   
+    Epoch 2/30
+    23209/23209 [==============================] - 158s - loss: 0.0061   
+    Epoch 3/30
+    23209/23209 [==============================] - 160s - loss: 0.0058   
+    Epoch 4/30
+    23209/23209 [==============================] - 159s - loss: 0.0056   
+    Epoch 5/30
+    23209/23209 [==============================] - 159s - loss: 0.0055   
+    Epoch 6/30
+    23209/23209 [==============================] - 160s - loss: 0.0053   
+    Epoch 7/30
+    23209/23209 [==============================] - 159s - loss: 0.0051   
+    Epoch 8/30
+    23209/23209 [==============================] - 158s - loss: 0.0049   
+    Epoch 9/30
+    23209/23209 [==============================] - 159s - loss: 0.0048   
+    Epoch 10/30
+    23209/23209 [==============================] - 158s - loss: 0.0047   
+    Epoch 11/30
+    23209/23209 [==============================] - 159s - loss: 0.0046   
+    Epoch 12/30
+    23209/23209 [==============================] - 158s - loss: 0.0045   
+    Epoch 13/30
+    23209/23209 [==============================] - 158s - loss: 0.0043   
+    Epoch 14/30
+    23209/23209 [==============================] - 158s - loss: 0.0043   
+    Epoch 15/30
+    23209/23209 [==============================] - 158s - loss: 0.0041   
+    Epoch 16/30
+    23209/23209 [==============================] - 161s - loss: 0.0040   
+    Epoch 17/30
+    23209/23209 [==============================] - 159s - loss: 0.0040   
+    Epoch 18/30
+    23209/23209 [==============================] - 161s - loss: 0.0039   
+    Epoch 19/30
+    23209/23209 [==============================] - 161s - loss: 0.0038   
+    Epoch 20/30
+    23209/23209 [==============================] - 160s - loss: 0.0037   
+    Epoch 21/30
+    23209/23209 [==============================] - 161s - loss: 0.0036   
+    Epoch 22/30
+    23209/23209 [==============================] - 161s - loss: 0.0036   
+    Epoch 23/30
+    23209/23209 [==============================] - 162s - loss: 0.0035   
+    Epoch 24/30
+    23209/23209 [==============================] - 161s - loss: 0.0035   
+    Epoch 25/30
+    23209/23209 [==============================] - 161s - loss: 0.0034   
+    Epoch 26/30
+    23209/23209 [==============================] - 160s - loss: 0.0033   
+    Epoch 27/30
+    23209/23209 [==============================] - 160s - loss: 0.0033   
+    Epoch 28/30
+    23209/23209 [==============================] - 161s - loss: 0.0032   
+    Epoch 29/30
+    23209/23209 [==============================] - 161s - loss: 0.0031   
+    Epoch 30/30
+    23209/23209 [==============================] - 147s - loss: 0.0031   
+
+
+
+
+
+    <keras.callbacks.History at 0x7ff2403375f8>
+
+
 
 ### saving trained model
 
@@ -209,7 +283,7 @@ print('Saved trained model at %s ' % model_path)
 
 ```
 
-    Saved trained model at /home/reza/DL/BrainProject/yousefi/saved_models/M1U.h5 
+    Saved trained model at /home/reza/DL/BrainProject/yousefi/saved_models/M1UE2.h5 
 
 
 ### import test path data
@@ -267,9 +341,9 @@ print('RMSE Estmation Y=%f'%rmsY)
 print('2D Distance=%f'%a)
 ```
 
-    RMSE Estmation X=12.180004
-    RMSE Estmation Y=9.385940
-    2D Distance=15.376878
+    RMSE Estmation X=12.469976
+    RMSE Estmation Y=6.348951
+    2D Distance=13.993194
 
 
 ### plot and save prediction Y test path
@@ -360,9 +434,9 @@ print('RMSE Estmation Y=%f'%rmsY)
 print('2D Distance=%f'%a)
 ```
 
-    RMSE Estmation X=6.316353
-    RMSE Estmation Y=3.542667
-    2D Distance=7.242017
+    RMSE Estmation X=1.541486
+    RMSE Estmation Y=1.996580
+    2D Distance=2.522402
 
 
 ### plot and save prediction Y Train path
@@ -411,4 +485,3 @@ plt.savefig('EstimatedTrainPath-X.png',format='png', dpi=1000,transparent=False)
 
 
 ![png](output_37_0.png)
-
